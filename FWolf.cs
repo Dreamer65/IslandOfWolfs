@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IslandOfWolfs
 {
@@ -14,6 +10,7 @@ namespace IslandOfWolfs
             _position = position;
             _hp = 1;
             _age = 0;
+            Position.AddAnimal(this);
         }
 
         private Random _random;
@@ -31,19 +28,60 @@ namespace IslandOfWolfs
 
         public int Age { get => _age; }
 
+        private Cell SearchRabit()
+        {
+            foreach (IAnimal animal in Position.Animals)
+            {
+                if (animal is Rabit) return null;
+            }
+
+            foreach (Cell cell in Position.Neighbors)
+            {
+                foreach (IAnimal animal in cell.Animals)
+                {
+                    if (animal is Rabit) return cell;
+                }
+            }
+            return null;
+        }
+
+        private Cell SearchFWolf()
+        {
+            foreach (Cell cell in Position.Neighbors)
+            {
+                foreach (IAnimal animal in cell.Animals)
+                {
+                    if (animal is FWolf) return cell;
+                }
+            }
+            return null;
+        }
+
         public void Move()
         {
             if (Position.Neighbors.Count == 0) return;
 
-            Cell newPosition = Position.Neighbors[0];
+            if (HP <= 0)
+            {
+                Die();
+                return;
+            }
+            _hp -= 0.1;
+
+            Cell newPosition = SearchRabit();
+
+            if (newPosition == null)
+            {
+                int newPosCount = _random.Next() % (Position.Neighbors.Count + 1);
+
+                if (newPosCount == Position.Neighbors.Count) return;
+
+                newPosition = Position.Neighbors[newPosCount];
+            }
+
             Position.DelAnimal(this);
             newPosition.AddAnimal(this);
             _position = newPosition;
-        }
-
-        public void Spown()
-        {
-
         }
 
         public override string ToString()
@@ -55,12 +93,40 @@ namespace IslandOfWolfs
         {
             Position?.DelAnimal(this);
             _position = null;
+            if (Death == null)
+                return;
             Death?.Invoke(this, new EventArgs());
         }
 
         public IAnimal Reproduction()
         {
-            throw new NotImplementedException();
+            foreach (IAnimal animal in Position.Animals)
+            {
+                if (animal is MWolf)
+                    if (_random.Next()%2 == 1)
+                        return new MWolf(Position, _random);
+                    else
+                        return new FWolf(Position, _random);
+            }
+            return null;
+        }
+
+        public void Eat()
+        {
+            IAnimal animal = null;
+            foreach (IAnimal item in Position.Animals)
+            {
+                if (item is Rabit)
+                {
+                    animal = item;
+                    break;
+                }
+            }
+            if(animal != null)
+            {
+                    animal.Die();
+                    _hp += 1;
+            }
         }
     }
 }

@@ -64,21 +64,22 @@ namespace IslandOfWolfs
         {
             get
             {
+                int rabits = 0, 
+                    MWolfs = 0,
+                    FWolfs = 0;
                 if (IsEmpty) return AnimalType.None;
                 foreach (IAnimal item in Animals)
                 {
-                    if (item is Rabit) return AnimalType.Rabit;
-                }
-                foreach (IAnimal item in Animals)
-                {
-                    if (item is FWolf) return AnimalType.FWolf;
-                }
-                foreach (IAnimal item in Animals)
-                {
-                    if (item is MWolf) return AnimalType.MWolf;
+                    if (item is Rabit) rabits++;
+                    if (item is FWolf) FWolfs++;
+                    if (item is MWolf) MWolfs++;
                 }
 
-                return AnimalType.None;
+                if (rabits != 0 && MWolfs + FWolfs == 0) return AnimalType.Rabit;
+                if (MWolfs != 0 && rabits + FWolfs == 0) return AnimalType.MWolf;
+                if (FWolfs != 0 && rabits + MWolfs == 0) return AnimalType.FWolf;
+                if (rabits == 0 && MWolfs == 0 && FWolfs == 0) return AnimalType.None;
+                return AnimalType.Multy;
             }
         }
 
@@ -122,11 +123,18 @@ namespace IslandOfWolfs
 
         private List<IAnimal> Animals { get; }
         Random _random;
+
+        private int _rabitsCount;
+        private int _MWolfsCount;
+        private int _FWolfsCount;
         public Island(int width, int height)
         {
             _random = new Random();
             _height = height;
             _width = width;
+            _rabitsCount = 0;
+            _MWolfsCount = 0;
+            _FWolfsCount = 0;
             cells = new Cell[width, height];
             Animals = new List<IAnimal>();
 
@@ -148,17 +156,27 @@ namespace IslandOfWolfs
 
         public Island(int width, int height, int rabitsCount, int FWolfsCount, int MWolfsCount) : this(width, height)
         {
+            Renovate(rabitsCount, FWolfsCount, MWolfsCount);
+        }
+
+        public void Renovate(int rabitsCount, int FWolfsCount, int MWolfsCount)
+        {
+
             Cell tmp;
             IAnimal animal;
 
-            for(int i = 0; i<rabitsCount; i++)
+            _rabitsCount = rabitsCount;
+            _MWolfsCount = MWolfsCount;
+            _FWolfsCount = FWolfsCount;
+
+            for (int i = 0; i < rabitsCount; i++)
             {
                 tmp = RandomEmptyCell();
                 if (tmp != null)
                 {
                     animal = new Rabit(tmp, _random);
-                    tmp.AddAnimal(animal);
                     Animals.Add(animal);
+                    animal.Death += Animal_Die;
                 }
             }
 
@@ -168,8 +186,8 @@ namespace IslandOfWolfs
                 if (tmp != null)
                 {
                     animal = new FWolf(tmp, _random);
-                    tmp.AddAnimal(animal);
                     Animals.Add(animal);
+                    animal.Death += Animal_Die;
                 }
             }
 
@@ -179,11 +197,34 @@ namespace IslandOfWolfs
                 if (tmp != null)
                 {
                     animal = new MWolf(tmp, _random);
-                    tmp.AddAnimal(animal);
                     Animals.Add(animal);
+                    animal.Death += Animal_Die;
                 }
             }
+        }
 
+        public event EventHandler RabitsWin;
+        public event EventHandler WolfsWin;
+
+        public void AddRabit(int x, int y)
+        {
+            IAnimal animal = new Rabit(cells[x, y], _random);
+            Animals.Add(animal);
+            animal.Death += Animal_Die;
+        }
+
+        public void AddMWolf(int x, int y)
+        {
+            IAnimal animal = new MWolf(cells[x, y], _random);
+            Animals.Add(animal);
+            animal.Death += Animal_Die;
+        }
+
+        public void AddFWolf(int x, int y)
+        {
+            IAnimal animal = new FWolf(cells[x, y], _random);
+            Animals.Add(animal);
+            animal.Death += Animal_Die;
         }
 
         private Cell RandomEmptyCell()
@@ -226,10 +267,54 @@ namespace IslandOfWolfs
 
         public void Step()
         {
+            if(_FWolfsCount + _MWolfsCount == 0)
+            {
+                RabitsWin?.Invoke(this, new EventArgs());
+                return;
+            }
+            if (_rabitsCount == 0)
+            {
+                WolfsWin?.Invoke(this, new EventArgs());
+                return;
+            }
+
+            for (int i = 0; i < Animals.Count; i++)
+            {
+                Animals[i].Eat();
+            }
+
+            for (int i = 0; i < Animals.Count; i++)
+            {
+                Animals[i].Move();
+            }
+
+            List<IAnimal> newby = new List<IAnimal>();
+            IAnimal animal;
             foreach (IAnimal item in Animals)
             {
-                item.Move();
+                animal = item.Reproduction();
+                if (animal != null) newby.Add(animal);
             }
+
+            if (newby.Count != 0)
+            {
+                foreach (IAnimal item in newby)
+                {
+                    item.Death += Animal_Die;
+                    if (item is Rabit) _rabitsCount++;
+                    else if (item is MWolf) _MWolfsCount++;
+                    else if (item is FWolf) _FWolfsCount++;
+                }
+                Animals.AddRange(newby);
+            }
+        }
+
+        private void Animal_Die(object sender, EventArgs e)
+        {
+            Animals.Remove((IAnimal)sender);
+            if (sender is Rabit) _rabitsCount--;
+            else if (sender is MWolf) _MWolfsCount--;
+            else if (sender is FWolf) _FWolfsCount--;
         }
     }
 }

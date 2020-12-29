@@ -14,6 +14,7 @@ namespace IslandOfWolfs
             _position = position;
             _hp = 1;
             _age = 0;
+            Position.AddAnimal(this);
         }
 
         private Random _random;
@@ -36,7 +37,7 @@ namespace IslandOfWolfs
         {
             if (Position.Neighbors.Count == 0) return;
 
-            int newPosCount = _random.Next(1000) % (Position.Neighbors.Count + 1);
+            int newPosCount = _random.Next() % (Position.Neighbors.Count + 1);
 
             if (newPosCount == Position.Neighbors.Count) return;
 
@@ -49,7 +50,7 @@ namespace IslandOfWolfs
 
         public override string ToString()
         {
-            return "R:" + HP.ToString();
+            return "R";
         }
 
         public void Die()
@@ -62,7 +63,23 @@ namespace IslandOfWolfs
 
         public IAnimal Reproduction()
         {
-            throw new NotImplementedException();
+            int count = 0;
+            foreach (IAnimal item in Position.Animals)
+            {
+                if (item is Rabit) count++;
+            }
+            if (count >= 3) return null;
+
+            int tmp = _random.Next();
+            tmp %= 5;
+
+            if (tmp == 3)
+            {
+                return new Rabit(Position, _random);
+            }
+            return null;
         }
+
+        public void Eat() { }
     }
 }

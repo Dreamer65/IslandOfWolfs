@@ -16,6 +16,7 @@ namespace IslandOfWolfs
         DataGridViewCellStyle rabitStyle;
         DataGridViewCellStyle MWolfStyle;
         DataGridViewCellStyle FWolfStyle;
+        DataGridViewCellStyle MultyStyle;
         private void InitializeStyles()
         {
             rabitStyle = new DataGridViewCellStyle();
@@ -35,11 +36,19 @@ namespace IslandOfWolfs
             FWolfStyle.SelectionBackColor = Color.Red;
             FWolfStyle.ForeColor = Color.White;
             FWolfStyle.SelectionForeColor = Color.White;
+            
+            MultyStyle = new DataGridViewCellStyle();
+            MultyStyle.BackColor = Color.Brown;
+            MultyStyle.SelectionBackColor = Color.Brown;
+            MultyStyle.ForeColor = Color.White;
+            MultyStyle.SelectionForeColor = Color.White;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            island = new Island(10, 10, 5, 3, 4);
+            island = new Island(20, 20, 5, 3, 4);
+            island.RabitsWin += rabits_Win;
+            island.WolfsWin += wolfs_Win;
             /* island[0, 0].AddAnimal(new Rabit(island[0, 0]));
              island[4, 5].AddAnimal(new Rabit(island[4, 5]));
              island[3, 6].AddAnimal(new Rabit(island[3, 6]));
@@ -86,6 +95,10 @@ namespace IslandOfWolfs
                     {
                         dataGrid.Rows[i].Cells[j].Style = MWolfStyle;
                     }
+                    else if (island[j, i].Owner == AnimalType.Multy)
+                    {
+                        dataGrid.Rows[i].Cells[j].Style = MultyStyle;
+                    }
                 }
             }
 
@@ -100,6 +113,18 @@ namespace IslandOfWolfs
         {
             island.Step();
             DrawIsland(dgvIsland, island);
+        }
+
+        private void rabits_Win(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            MessageBox.Show("Победили кролики");
+        }
+
+        private void wolfs_Win(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            MessageBox.Show("Победили волки");
         }
     }
 

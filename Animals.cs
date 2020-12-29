@@ -2,14 +2,13 @@
 
 namespace IslandOfWolfs
 {
-
-
     enum AnimalType
     {
         None,
         Rabit,
         MWolf,
-        FWolf
+        FWolf,
+        Multy
     }
     interface IAnimal
     {
@@ -18,6 +17,7 @@ namespace IslandOfWolfs
         double HP { get; }
         int Age { get; }
         void Move();
+        void Eat();
         void Die();
         event EventHandler Death;
         IAnimal Reproduction();
