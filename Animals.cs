@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Rabits_Island
+namespace IslandOfWolfs
 {
+
+
     enum AnimalType
     {
+        None,
         Rabit,
         MWolf,
         FWolf
@@ -15,13 +14,12 @@ namespace Rabits_Island
     interface IAnimal
     {
         AnimalType Type { get; }
-        int HP { get; }
+        Cell Position { get; }
+        double HP { get; }
         int Age { get; }
         void Move();
-        void Spown();
-    }
-
-    class Rabit
-    {
+        void Die();
+        event EventHandler Death;
+        IAnimal Reproduction();
     }
 }
