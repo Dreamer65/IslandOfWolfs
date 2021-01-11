@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IslandOfWolfs", "IslandOfWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxesAndChickens", "FoxesAndChickens\FoxesAndChickens.csproj", "{7927D07A-0A16-4F91-91C4-75457D163954}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matimatico", "Matimatico\Matimatico.csproj", "{527DFA63-1BF4-41D3-A524-B1AAB488C1BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7927D07A-0A16-4F91-91C4-75457D163954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7927D07A-0A16-4F91-91C4-75457D163954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7927D07A-0A16-4F91-91C4-75457D163954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{527DFA63-1BF4-41D3-A524-B1AAB488C1BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{527DFA63-1BF4-41D3-A524-B1AAB488C1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{527DFA63-1BF4-41D3-A524-B1AAB488C1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{527DFA63-1BF4-41D3-A524-B1AAB488C1BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
