@@ -1,12 +1,16 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace Matimatico
 {
     public partial class Form1 : Form
     {
         Game game;
+        Bot bot;
         int currentCard;
         int cardCount;
+
+        bool isGame = false;
         public Form1()
         {
             InitializeComponent();
@@ -91,8 +95,10 @@ namespace Matimatico
 
         private void dgvHuman_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (!isGame) return;
+
             ((DataGridView)sender).ClearSelection();
-            if(((DataGridView)sender).Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
+            if (((DataGridView)sender).Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
             {
                 MessageBox.Show("Ячейка уже занята.");
                 return;
@@ -100,26 +106,45 @@ namespace Matimatico
 
             ((DataGridView)sender).Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCard;
 
-            currentCard = game.NextCard();
-            lbCurrentCard.Text = currentCard.ToString();
-            cardCount++;
-
-            if (cardCount == 25) CalculateResults();
+            bot.Step(currentCard);
         }
 
-        private void pbNewGame_Click(object sender, System.EventArgs e)
+        private void pbNewGame_Click(object sender, EventArgs e)
         {
             game = new Game();
+            bot = new Bot();
+            bot.TurnDone += Bot_TurnDone;
             currentCard = game.NextCard();
             lbCurrentCard.Text = currentCard.ToString();
             cardCount = 0;
             CleareDataGridViev(dgvHuman);
+            CleareDataGridViev(dgvComputer);
+
+            isGame = true;
         }
 
         private void CalculateResults()
         {
             int[,] mass = ReadDataGridViev(dgvHuman);
-            MessageBox.Show(string.Format("Результат: {0}", Game.CountResult(mass)));
+            MessageBox.Show(string.Format("Результат человека: {0}", Game.CountResult(mass)));
+
+            mass = ReadDataGridViev(dgvComputer);
+            MessageBox.Show(string.Format("Результат компьютера: {0}", Game.CountResult(mass)));
+        }
+
+        private void Bot_TurnDone(object sender, BotTurnDoneEventArgs e)
+        {
+            dgvComputer[e.ColumnIndex, e.RowIndex].Value = e.Value;
+
+            currentCard = game.NextCard();
+            lbCurrentCard.Text = currentCard.ToString();
+            cardCount++;
+
+            if (cardCount == 25)
+            {
+                isGame = false;
+                CalculateResults();
+            }
         }
     }
 }
