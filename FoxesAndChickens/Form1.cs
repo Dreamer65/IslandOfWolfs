@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FoxesAndChickens
@@ -7,6 +9,8 @@ namespace FoxesAndChickens
     public partial class Form1 : Form
     {
         Map map;
+        Bot bot;
+
 
         public Form1()
         {
@@ -19,6 +23,9 @@ namespace FoxesAndChickens
             map = new Map();
             map.MapChenged += Map_Chenged;
             PaintDataGrid(dgvMap, map);
+
+            bot = new Bot(map);
+
         }
 
         DataGridViewCellStyle chickenStyle;
@@ -35,9 +42,9 @@ namespace FoxesAndChickens
 
             foxStyle = new DataGridViewCellStyle();
             foxStyle.BackColor = Color.Orange;
-            foxStyle.SelectionBackColor = Color.OrangeRed;
+            foxStyle.SelectionBackColor = Color.Orange;
             foxStyle.ForeColor = Color.Orange;
-            foxStyle.SelectionForeColor = Color.OrangeRed;
+            foxStyle.SelectionForeColor = Color.Orange;
 
             noneStyle = new DataGridViewCellStyle();
             noneStyle.BackColor = Color.White;
@@ -111,6 +118,13 @@ namespace FoxesAndChickens
         void Map_Chenged(object sender, EventArgs e)
         {
             PaintDataGrid(dgvMap, (Map)sender);
+            //bot.Step();
+        }
+
+        void BotStep()
+        {
+            Task.Run(() => bot.Step());
+            
         }
 
         void PaintDataGrid(DataGridView dataGrid, Map map)
@@ -148,6 +162,14 @@ namespace FoxesAndChickens
 
         private void dgvMap_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if(map[e.RowIndex, e.ColumnIndex]?.Visitor == CellVisitor.Fox)
+            {
+                current = null;
+                dgvMap.ClearSelection();
+                selectedCell = null;
+                return;
+            }
+
             if(current == null)
             {
                 current = map[e.RowIndex, e.ColumnIndex];
@@ -155,7 +177,8 @@ namespace FoxesAndChickens
                 return;
             }
 
-            if(current == map[e.RowIndex, e.ColumnIndex])
+
+            if (current == map[e.RowIndex, e.ColumnIndex])
             {
                 current = null;
                 dgvMap.ClearSelection();
@@ -170,6 +193,7 @@ namespace FoxesAndChickens
                     dgvMap.ClearSelection();
                     selectedCell = null;
                     current = null;
+                    BotStep();
                     return;
                 }
                 dgvMap.CurrentCell = selectedCell;
@@ -182,6 +206,7 @@ namespace FoxesAndChickens
                     dgvMap.ClearSelection();
                     selectedCell = null;
                     current = null;
+                    BotStep();
                     return;
                 }
                 dgvMap.CurrentCell = selectedCell;
@@ -194,6 +219,7 @@ namespace FoxesAndChickens
                     dgvMap.ClearSelection();
                     selectedCell = null;
                     current = null;
+                    BotStep();
                     return;
                 }
                 dgvMap.CurrentCell = selectedCell;
@@ -206,6 +232,7 @@ namespace FoxesAndChickens
                     dgvMap.ClearSelection();
                     selectedCell = null;
                     current = null;
+                    BotStep();
                     return;
                 }
                 dgvMap.CurrentCell = selectedCell;

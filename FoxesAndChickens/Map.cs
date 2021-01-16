@@ -8,6 +8,9 @@ namespace FoxesAndChickens
         private const int _height = 7;
         private const int _width = 7;
 
+        public int Height { get => _height; }
+        public int Width { get => _width; }
+
         private int _chikenCount;
         private int _foxCount;
         public Map()
@@ -58,6 +61,8 @@ namespace FoxesAndChickens
         }
 
         public event EventHandler MapChenged;
+        public event EventHandler FoxMoveDone;
+        public event EventHandler ChickenMoveDone;
 
 
         private readonly Cell[,] cells;
@@ -182,6 +187,7 @@ namespace FoxesAndChickens
                 cell.Visitor = CellVisitor.None;
 
                 MapChenged?.Invoke(this, new EventArgs());
+                FoxMoveDone?.Invoke(this, new EventArgs());
                 return true;
             }
 
@@ -197,6 +203,7 @@ namespace FoxesAndChickens
                 cell.Visitor = CellVisitor.None;
 
                 MapChenged?.Invoke(this, new EventArgs());
+                FoxMoveDone?.Invoke(this, new EventArgs());
                 return true;
             }
             return false;
@@ -214,6 +221,7 @@ namespace FoxesAndChickens
             cell.Visitor = CellVisitor.None;
 
             MapChenged?.Invoke(this, new EventArgs());
+            ChickenMoveDone?.Invoke(this, new EventArgs());
             return true;
         }
     }

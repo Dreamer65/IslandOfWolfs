@@ -51,7 +51,7 @@ namespace Matimatico
                 {
                     keep[j] = field[i, j];
                 }
-
+                result += Analyzer(keep);
             }
 
             for (int i = 0; i < 5; i++)
